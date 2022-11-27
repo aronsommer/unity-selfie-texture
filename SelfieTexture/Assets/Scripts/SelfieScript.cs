@@ -13,7 +13,9 @@ public class SelfieScript : MonoBehaviour
     public GameObject Plane2;
     public RawImage rawImage1;
     public RawImage rawImage2;
-    public GameObject SquareSprite;
+    public GameObject SquareSprite1;
+    public GameObject SquareSprite2;
+    public Material SpriteWebCamTextureMaterial;
 
     private Quaternion baseRotation3d;
     private Quaternion baseRotation2d;
@@ -33,7 +35,10 @@ public class SelfieScript : MonoBehaviour
         webcamTexture = new WebCamTexture();
         Plane1.GetComponent<Renderer>().material.mainTexture = webcamTexture;
         rawImage1.texture = webcamTexture;
+        SpriteWebCamTextureMaterial.SetTexture("_BlendTex", webcamTexture);
+        SquareSprite1.GetComponent<SpriteRenderer>().material = SpriteWebCamTextureMaterial;
         webcamTexture.Play();
+
 #endif
         // Android
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -45,6 +50,8 @@ public class SelfieScript : MonoBehaviour
                 webcamTexture = new WebCamTexture(device.name);                
                 Plane1.GetComponent<Renderer>().material.mainTexture = webcamTexture;
                 rawImage1.texture = webcamTexture;
+                SpriteWebCamTextureMaterial.SetTexture("_BlendTex", webcamTexture);
+                SquareSprite1.GetComponent<SpriteRenderer>().material = SpriteWebCamTextureMaterial;
                 webcamTexture.Play();
             }
         }
@@ -95,12 +102,17 @@ public class SelfieScript : MonoBehaviour
                 500.0f
             );
             // Apply sprite
-            SquareSprite.GetComponent<SpriteRenderer>().sprite = blankSprite;
+            SquareSprite2.GetComponent<SpriteRenderer>().sprite = blankSprite;
         }
     }
 
     void Update()
     {
+        // Correct the aspect ratio of raw image
+        float videoRatio = (float)webcamTexture.width / (float)webcamTexture.height;
+        rawImage1.GetComponent<AspectRatioFitter>().aspectRatio = videoRatio;
+        rawImage2.GetComponent<AspectRatioFitter>().aspectRatio = videoRatio;
+
         // Correct the rotation of objects because webcamTexture rotation was different on Android
         // transform.rotation = baseRotation * Quaternion.AngleAxis(webcamTexture.videoRotationAngle, Vector3.up);
         Plane1.transform.rotation =
@@ -111,7 +123,9 @@ public class SelfieScript : MonoBehaviour
             baseRotation2d * Quaternion.AngleAxis(webcamTexture.videoRotationAngle, Vector3.back);
         rawImage2.transform.rotation =
             baseRotation2d * Quaternion.AngleAxis(webcamTexture.videoRotationAngle, Vector3.back);
-        SquareSprite.transform.rotation =
+        SquareSprite1.transform.rotation =
+            baseRotation2d * Quaternion.AngleAxis(webcamTexture.videoRotationAngle, Vector3.back);
+        SquareSprite2.transform.rotation =
             baseRotation2d * Quaternion.AngleAxis(webcamTexture.videoRotationAngle, Vector3.back);
     }
 
@@ -138,10 +152,10 @@ public class SelfieScript : MonoBehaviour
             rawImage2.transform.localScale.y,
             rawImage2.transform.localScale.z
         );
-        SquareSprite.transform.localScale = new Vector3(
-            SquareSprite.transform.localScale.x * -1,
-            SquareSprite.transform.localScale.y,
-            SquareSprite.transform.localScale.z
+        SquareSprite2.transform.localScale = new Vector3(
+            SquareSprite1.transform.localScale.x * -1,
+            SquareSprite1.transform.localScale.y,
+            SquareSprite1.transform.localScale.z
         );
 #endif
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -165,10 +179,10 @@ public class SelfieScript : MonoBehaviour
             rawImage2.transform.localScale.y * -1,
             rawImage2.transform.localScale.z
         );
-        SquareSprite.transform.localScale = new Vector3(
-            SquareSprite.transform.localScale.x,
-            SquareSprite.transform.localScale.y * -1,
-            SquareSprite.transform.localScale.z
+        SquareSprite2.transform.localScale = new Vector3(
+            SquareSprite1.transform.localScale.x,
+            SquareSprite1.transform.localScale.y * -1,
+            SquareSprite1.transform.localScale.z
         );
 #endif
     }
