@@ -16,8 +16,11 @@ public class SelfieScript : MonoBehaviour
     public GameObject SquareSprite1;
     public GameObject SquareSprite2;
     public Material SpriteWebCamTextureMaterial;
+    public GameObject Sphere1;
+    public GameObject Sphere2;
 
     private Quaternion baseRotation3d;
+    private Quaternion baseRotation3dsphere;
     private Quaternion baseRotation2d;
 
     void Start()
@@ -25,6 +28,12 @@ public class SelfieScript : MonoBehaviour
         Btn.onClick.AddListener(StartTakePhoto);
 
         baseRotation3d = Plane1.transform.rotation;
+#if UNITY_EDITOR || UNITY_STANDALONE
+        baseRotation3dsphere = Quaternion.Euler(0, -90, 0);
+#endif
+#if UNITY_ANDROID && !UNITY_EDITOR
+baseRotation3dsphere = Quaternion.Euler(-90, 0, 0);
+#endif
         baseRotation2d = rawImage1.transform.rotation;
 
         // Flip objects scale to negative because webcamTexture is mirrored
@@ -37,6 +46,7 @@ public class SelfieScript : MonoBehaviour
         rawImage1.texture = webcamTexture;
         SpriteWebCamTextureMaterial.SetTexture("_BlendTex", webcamTexture);
         SquareSprite1.GetComponent<SpriteRenderer>().material = SpriteWebCamTextureMaterial;
+        Sphere1.GetComponent<Renderer>().material.mainTexture = webcamTexture;
         webcamTexture.Play();
 
 #endif
@@ -52,6 +62,7 @@ public class SelfieScript : MonoBehaviour
                 rawImage1.texture = webcamTexture;
                 SpriteWebCamTextureMaterial.SetTexture("_BlendTex", webcamTexture);
                 SquareSprite1.GetComponent<SpriteRenderer>().material = SpriteWebCamTextureMaterial;
+                Sphere1.GetComponent<Renderer>().material.mainTexture = webcamTexture;
                 webcamTexture.Play();
             }
         }
@@ -94,6 +105,7 @@ public class SelfieScript : MonoBehaviour
             // Apply texture
             Plane2.GetComponent<Renderer>().material.mainTexture = texture;
             rawImage2.texture = texture;
+            Sphere2.GetComponent<Renderer>().material.mainTexture = texture;
             // Create sprite from texture
             Sprite blankSprite = Sprite.Create(
                 texture,
@@ -127,6 +139,12 @@ public class SelfieScript : MonoBehaviour
             baseRotation2d * Quaternion.AngleAxis(webcamTexture.videoRotationAngle, Vector3.back);
         SquareSprite2.transform.rotation =
             baseRotation2d * Quaternion.AngleAxis(webcamTexture.videoRotationAngle, Vector3.back);
+        Sphere1.transform.rotation =
+            baseRotation3dsphere
+            * Quaternion.AngleAxis(webcamTexture.videoRotationAngle, Vector3.back);
+        Sphere2.transform.rotation =
+            baseRotation3dsphere
+            * Quaternion.AngleAxis(webcamTexture.videoRotationAngle, Vector3.back);
     }
 
     void Flip()
@@ -157,6 +175,16 @@ public class SelfieScript : MonoBehaviour
             SquareSprite1.transform.localScale.y,
             SquareSprite1.transform.localScale.z
         );
+        Sphere1.transform.localScale = new Vector3(
+            Sphere1.transform.localScale.x * -1,
+            Sphere1.transform.localScale.y,
+            Sphere1.transform.localScale.z
+        );
+        Sphere2.transform.localScale = new Vector3(
+            Sphere2.transform.localScale.x * -1,
+            Sphere2.transform.localScale.y,
+            Sphere2.transform.localScale.z
+        );
 #endif
 #if UNITY_ANDROID && !UNITY_EDITOR
         Plane1.transform.localScale = new Vector3(
@@ -183,6 +211,16 @@ public class SelfieScript : MonoBehaviour
             SquareSprite1.transform.localScale.x,
             SquareSprite1.transform.localScale.y * -1,
             SquareSprite1.transform.localScale.z
+        );
+        Sphere1.transform.localScale = new Vector3(
+            Sphere1.transform.localScale.x,
+            Sphere1.transform.localScale.y * -1,
+            Sphere1.transform.localScale.z
+        );
+        Sphere2.transform.localScale = new Vector3(
+            Sphere2.transform.localScale.x,
+            Sphere2.transform.localScale.y * -1,
+            Sphere2.transform.localScale.z
         );
 #endif
     }
