@@ -83,10 +83,10 @@ baseRotation3dsphere = Quaternion.Euler(-90, 0, 0);
         photo.Apply();
 
         byte[] bytes = photo.EncodeToPNG();
-        File.WriteAllBytes(Application.persistentDataPath + "-Photo.png", bytes);
+        File.WriteAllBytes(Application.persistentDataPath + "/Selfie.png", bytes);
 
         // Load photo after saving
-        LoadPhoto(Application.persistentDataPath + "-Photo.png");
+        LoadPhoto(Application.persistentDataPath + "/Selfie.png");
     }
 
     private void LoadPhoto(string path)
